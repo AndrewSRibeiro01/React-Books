@@ -1,10 +1,10 @@
 import Input from "../Input"
 import styled from "styled-components"
-import { useState } from "react"
-import { livros } from "./dadosPesquisa"
+import { useEffect, useState } from "react"
+import { getLivros } from "../../svc/livros"
 
 const PesquisaContainer = styled.section`
-    background-image: linear-gradient(90deg, #520000  35%, #3ff0000 165%);
+    background-image: linear-gradient(90deg, #520000 35%, #ff0000 165%);
     color: #FFF;
     text-align: center;
     padding: 85px 0;
@@ -41,6 +41,16 @@ const Resultado = styled.div`
 
 function Pesquisa() {
     const [livrosPesquisados, setlivrosPesquisados] = useState([])
+    const [livros, setLivros] = useState([]);
+
+    useEffect(() => {
+        fetchLivros();
+    }, [])
+
+    const fetchLivros = async () => {
+        const livrosDaApi = await getLivros()
+        setLivros(livrosDaApi)
+    }
 
     return (
         <PesquisaContainer>
@@ -50,14 +60,14 @@ function Pesquisa() {
                 placeholder="Escreva sua proxima leitura"
                 onBlur={evento => {
                     const textoDigitado = evento.target.value
-                    const resultadoPesquisa = livros.filter(livro => livro.nome.includes(textoDigitado))
+                    const resultadoPesquisa = livros.filter(f => f.nome.includes(textoDigitado))
                     setlivrosPesquisados(resultadoPesquisa)
                 }}
             />
-            { livrosPesquisados.map( livro => (
+            {livrosPesquisados.map(livro => (
                 <Resultado>
                     <p>{livro.nome}</p>
-                    <img src={livro.src}/>
+                    <img src={livro.src} alt="imagem" />
                 </Resultado>
             ))}
         </PesquisaContainer>
