@@ -2,13 +2,15 @@ import Input from "../Input"
 import styled from "styled-components"
 import { useEffect, useState } from "react"
 import { getLivros } from "../../svc/livros"
+import { postFavoritos } from "../../svc/favoritos"
+import { enqueueSnackbar } from "notistack"
 
 const PesquisaContainer = styled.section`
     background-image: linear-gradient(90deg, #520000 35%, #ff0000 165%);
     color: #FFF;
     text-align: center;
     padding: 85px 0;
-    height: 270px;
+    height: 100%;
     width: 100%;
 `
 const Titulo = styled.h2`
@@ -52,6 +54,15 @@ function Pesquisa() {
         setLivros(livrosDaApi)
     }
 
+    const insertFavorito = async (id) => {
+        try {
+            await postFavoritos(id)
+            enqueueSnackbar(`Livro ${id} inserido com sucesso!`, { variant: 'success' })
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <PesquisaContainer>
             <Titulo>Já sabe por onde começar?</Titulo>
@@ -65,9 +76,8 @@ function Pesquisa() {
                 }}
             />
             {livrosPesquisados.map(livro => (
-                <Resultado>
+                <Resultado onClick={() => insertFavorito(livro.id)}>
                     <p>{livro.nome}</p>
-                    <img src={livro.src} alt="imagem" />
                 </Resultado>
             ))}
         </PesquisaContainer>
